@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>越南语-语法-排序练习</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding-bottom: 300px;
+            background-color: #f7fbf3;
+        }
+        
+        #gameContainer {
+            min-height: calc(100vh - 150px);
+        }
+        
+        #infoBox {
+            width: 95%; 
+            max-width: 700px;
+            min-height: 100px; 
+            margin: 0 auto; 
+            border: 2px solid #72a9db; /*041b31 1f4263*/
+            background: #63a0d8; /*ecf2e4 fefefc 63a0d8 */
+            color: #ffffff; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: clamp(40px, 5vw, 60px);
+            font-weight: bold;
+        }
+        
+        #contactBox, #instructionBox {
+            width: 90%;
+            max-width: 700px;
+            min-height: 25px;
+            margin: 0px auto;
+            border: 2px solid #72a9db;
+            background: #63a0d8;
+            color: #ffd300;
+            padding-left: 20px;
+            display: flex;
+            align-items: center;
+            font-size: clamp(16px, 2vw, 20px);
+            font-weight: bold;
+        }
+        
+        #instructionBox {
+            color: #f7e19c;
+        }
+
+        #indicator, #indicator2 {
+            width: 90%;
+            max-width: 700px;
+            min-height: 70px;
+            margin: 15px auto;
+            padding: 15px;
+            border: 3px solid #fed16a;
+            background: #ffffe0;
+            border-radius: 5px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: center;
+            align-items: center;
+            font-size: clamp(32px, 5vw, 48px);
+            font-weight: bold;
+        }
+        
+        #indicator2 {
+            background: #fffbef;
+            border: 3px solid #ccc;
+            min-height: 90px;
+            transition: all .4s;
+        }
+        
+        #indicator2.correct {
+            background: #B7D7AA !important;
+            border-color: #5ba346;
+        }
+        
+        #indicator2.wrong {
+            background: #ffcccc !important;
+            border-color: #CE6D5E;
+        }
+
+        .word-btn {
+            padding: 10px 20px;
+            background: #fff;
+            border: 2px solid #63a0d8;
+            border-radius: 12px;
+            font-size: clamp(32px, 5vw, 48px);
+            cursor: pointer;
+            user-select: none;
+            box-shadow: 0 3px 6px rgba(0,0,0,.15);
+            transition: all .2s;
+            min-width: 60px;
+            text-align: center;
+        }
+        
+        .word-btn.used {
+            opacity: 0.35;
+            pointer-events: none;
+        }
+        
+        .word-btn-in-answer {
+            background: #ffd700 !important;
+            animation: pop .3s;
+        }
+        
+        @keyframes pop {
+            0% { transform: scale(0.8); }
+            100% { transform: scale(1); }
+        }
+
+        #optionsPool {
+            width: 95%;
+            max-width: 700px;
+            margin: 20px auto;
+            padding: 15px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        #controls {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 95%;
+            max-width: 800px;
+            background: #f7fbf3;
+            padding: 10px 0;
+            z-index: 1000;
+        }
+        
+        button {
+            padding: 8px 12px;
+            margin: 2px 3px;
+            cursor: pointer;
+            border: 2px solid #63a0d8;
+            background: #63a0d8;
+            color: #fffbef;
+            font-size: 28px;
+            border-radius: 5px;
+        }
+        
+        .active-mode {
+            border: 2px solid #fed16a;
+        }
+        
+        .disabled {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        #results, #score {
+            width: 95%;
+            max-width: 700px;
+            margin: 20px auto;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 28px;
+            display: none;
+        }
+        
+        #results {
+            border: 2px solid #734A2E;
+            background: #fffbef;
+        }
+        
+        #score {
+            color: #FF6820;
+            background: #fffbef;
+            border: 2px solid #FF6820;
+        }
+                #sentenceNumber {
+                        width: 70px;
+                        height: 30px;
+                        text-align: center;
+                        font-size: 20px;
+                        border: 2px solid #63a0d8;
+                        border-radius: 5px;
+                        margin: 0 5px;
+                }
+        @media (max-width: 768px) {
+            body {
+                padding-bottom: 220px;
+            }
+            
+            button {
+                font-size: 20px;
+            }
+            
+            .word-btn {
+                font-size: 28px;
+                padding: 8px 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <div id="infoBox">习得越南语<br>语法 - 排序练习</div>
+        <div id="contactBox">讲师-阮玉煌 | Weixin：XiDeYueNanYu</div>
+        <div id="instructionBox">把词语按正确顺序排列 </div>
+
+        <div id="indicator"></div>
+        <div id="indicator2"></div>
+        <div id="optionsPool"></div>
+
+        <div id="results"></div>
+        <div id="score">0/0</div>
+    </div>
+
+    <div id="controls">
+        <div>
+            <button id="freeModeBtn" class="active-mode">自由模式</button>
+            <button id="testModeBtn">作业模式</button>
+        </div>
+        <div>
+            <button id="autoContinueBtn">自动继续</button>
+            <button id="showHideBtn">显示-隐藏</button>
+        </div>
+        <div>
+            <button id="prevBtn">◀</button>
+            <input type="text" id="sentenceNumber" inputmode="numeric">
+            <button id="nextBtn">▶</button>
+            <button id="replayBtn">再听一遍</button>
+        </div>
+    </div>
+
+    <audio id="mainAudio"></audio>
+    <audio id="correctAudio" src="Dung.mp3"></audio>
+    <audio id="wrongAudio" src="Sai.mp3"></audio>
+
+    <script>
+
+const sentences = [
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.138583,
+        "end": 1.418583,
+        "correctAnswer": "【Anh】【làm】【nghề】【gì】?",
+        "translation": "你做什么工作？",
+        "options": [
+            "Anh lam nghề gì?",
+            "Anh làm nghệ gì?",
+            "Anh làm nghề dì?",
+            "Anh làm nghề gì?"
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 1.638583,
+        "end": 2.818583,
+        "correctAnswer": "【Tôi】【là】【kỹ】【sư】.",
+        "translation": "我是工程师。",
+        "options": [
+            "Tôi là kỷ sư.",
+            "Tôi là kỹ xư.",
+            "Tô là kỹ sư.",
+            "Tôi là kỹ sư."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 3.148583,
+        "end": 4.378583,
+        "correctAnswer": "【Bạn】【làm】【nghề】【gì】?",
+        "translation": "你做什么工作？",
+        "options": [
+            "Bạn làm nghè gì?",
+            "Bạn lam nghề gì?",
+            "Bạn làm nghề dì?",
+            "Bạn làm nghề gì?"
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 4.588583,
+        "end": 5.478583,
+        "correctAnswer": "【Tôi】【làm】【bác】【sỹ】.",
+        "translation": "我是医生。",
+        "options": [
+            "Tôi làm bát sỹ.",
+            "Tôi lằm bác sỹ.",
+            "Tô lằm bác sỹ.",
+            "Tôi làm bác sỹ."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 6.228583,
+        "end": 7.238583,
+        "correctAnswer": "【Chị】【làm】【gì】?",
+        "translation": "姐姐你做什么？",
+        "options": [
+            "Chị làm dì?",
+            "Chị lam gì?",
+            "Chị làm gị?",
+            "Chị làm gì?"
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 7.528583,
+        "end": 8.768583,
+        "correctAnswer": "【Tôi】【làm】【trợ】【lý】.",
+        "translation": "我是助理。",
+        "options": [
+            "Tôi làm chợ lý.",
+            "Tôi làm trợ lỹ.",
+            "Tô làm trợ lý.",
+            "Tôi làm trợ lý."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 9.198583,
+        "end": 10.388583,
+        "correctAnswer": "【Ông】【ấy】【làm】【gì】?",
+        "translation": "他做什么工作？",
+        "options": [
+            "Ông ẩy làm gì?",
+            "Ông ấy làm gỉ?",
+            "Ôn ấy làm gì?",
+            "Ông ấy làm gì?"
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 10.658583,
+        "end": 12.008583,
+        "correctAnswer": "【Ông】【ấy】【là】【giám】【đốc】.",
+        "translation": "他是总经理。",
+        "options": [
+            "Ông ấy là giám độc.",
+            "Ông ấy là giam đốc.",
+            "Ông ẩy là giám đốc.",
+            "Ông ấy là giám đốc."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 12.428583,
+        "end": 13.638583,
+        "correctAnswer": "【Bà】【ấy】【làm】【gì】?",
+        "translation": "她做什么工作？",
+        "options": [
+            "Bà ấy lam gì?",
+            "Bà ấy làm gỉ?",
+            "Bà ẩy làm gì?",
+            "Bà ấy làm gì?"
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 13.968583,
+        "end": 15.528583,
+        "correctAnswer": "【Bà】【ấy】【làm】【giáo】【viên】.",
+        "translation": "她是老师。",
+        "options": [
+            "Bà ấy làm gióa viên.",
+            "Bà ẩy làm giáo viên.",
+            "Bà ấy làm giáo viển.",
+            "Bà ấy làm giáo viên."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 16.068583,
+        "end": 17.858583,
+        "correctAnswer": "【Bạn】【có】【phải】【là】【giáo】【viên】【không】?",
+        "translation": "你是老师吗？",
+        "options": [
+            "Bạn có phái là giáo viên không?",
+            "Bạn có phải là giáo viển không?",
+            "Bạn cố phải là giáo viên không?",
+            "Bạn có phải là giáo viên không?"
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 18.288583,
+        "end": 20.048583,
+        "correctAnswer": "【Vâng】. 【Tôi】【là】【giáo】【viên】.",
+        "translation": "是的，我是老师。",
+        "options": [
+            "Vâng. Tôi là gáo viên.",
+            "Vâng. Tô là giáo viên.",
+            "Vâng. Tôi là giáo viển.",
+            "Vâng. Tôi là giáo viên."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 20.568583,
+        "end": 22.488583,
+        "correctAnswer": "【Anh】【ấy】 có phải là 【nhà】【báo】【không】?",
+        "translation": "他是记者吗？",
+        "options": [
+            "Anh ấy có phải là nhá báo không?",
+            "Anh ấy có phái là nhà báo không?",
+            "Anh ấy cố phải là nhà báo không?",
+            "Anh ấy có phải là nhà báo không?"
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 23.008583,
+        "end": 24.978583,
+        "correctAnswer": "【Anh】【ấy】【là】【nhà】【báo】【có phải không】?",
+        "translation": "他是记者，对吗？",
+        "options": [
+            "Anh ấy là nhá báo có phải không?",
+            "Anh ấy là nhà báo có phái không?",
+            "Anh ấy là nhà báo có phải khong?",
+            "Anh ấy là nhà báo có phải không?"
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 25.508583,
+        "end": 27.358583,
+        "correctAnswer": "【Có phải】【anh】【ấy】【là】【nhà】【báo】【không】?",
+        "translation": "他是记者，对不对？",
+        "options": [
+            "Có phải anh ấy là nhá báo không?",
+            "Có phải anh ấy là nhà báo khong?",
+            "Có phải anh ấy là nhà bào không?",
+            "Có phải anh ấy là nhà báo không?"
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 27.888583,
+        "end": 31.638583,
+        "correctAnswer": "【Không】. 【Anh】【ấy】【không】【phải】【là】【nhà】【báo】. 【Anh】【ấy】【là luật sư】.",
+        "translation": "不，他不是记者。他是律师。",
+        "options": [
+            "Không. Anh ấy không phải là nhá báo. Anh ấy là luật xư.",
+            "Không. Anh ấy không phái là nhà báo. Anh ấy là luật sư.",
+            "Không. Anh ấy không phải là nhà bào. Anh ấy là luật sư.",
+            "Không. Anh ấy không phải là nhà báo. Anh ấy là luật sư."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 32.408583,
+        "end": 34.268583,
+        "correctAnswer": "【Cô】【ấy】【là】【y】【tá】【có phải không】?",
+        "translation": "她是护士，对吗？",
+        "options": [
+            "Cô ấy là y tả có phải không?",
+            "Cô ẩy là y tá có phải không?",
+            "Cô ấy là y tá có phái không?",
+            "Cô ấy là y tá có phải không?"
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 34.678583,
+        "end": 36.818583,
+        "correctAnswer": "【Không】. 【Cô】【ấy】【là】【thư】【ký】.",
+        "translation": "不，她是秘书。",
+        "options": [
+            "Không. Cô ấy là thử ký.",
+            "Không. Cô ẩy là thư ký.",
+            "Không. Cô ấy là thư kỷ.",
+            "Không. Cô ấy là thư ký."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 37.228583,
+        "end": 39.058583,
+        "correctAnswer": "【Có phải】【cậu】【ấy】【là】【học】【sinh】【không】?",
+        "translation": "他是小学生吗？",
+        "options": [
+            "Có phải cậu ấy là học xinh không?",
+            "Có phái cậu ấy là học sinh không?",
+            "Có phải cậu ấy là học sinh khong?",
+            "Có phải cậu ấy là học sinh không?"
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 39.348583,
+        "end": 41.468583,
+        "correctAnswer": "【Không】. 【Cậu】【ấy】【là】【sinh】【viên】.",
+        "translation": "不，他是大学生。",
+        "options": [
+            "Không. Cậu ấy là sinh viên.",
+            "Không. Cậu ấy là xinh viên.",
+            "Không. Cậu ấy là sinh viển.",
+            "Không. Cẩu ấy là sinh viên."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 42.068583,
+        "end": 43.918583,
+        "correctAnswer": "【Có phải】【ông】【ấy】【là】【nông】【dân】【không】?",
+        "translation": "他是农民吗？",
+        "options": [
+            "Có phải ông ấy là nông dần không?",
+            "Có phải ông ấy là nong dân không?",
+            "Có phái ông ấy là nông dân không?",
+            "Có phải ông ấy là nông dân không?"
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 44.198583,
+        "end": 46.208583,
+        "correctAnswer": "【Không】. 【Ông】【ấy】【là】【công】【nhân】.",
+        "translation": "不，他是工人。",
+        "options": [
+            "Không. Ông ấy là công nhan.",
+            "Không. Ông ấy là công nhận.",
+            "Không. Ông ẩy là công nhân.",
+            "Không. Ông ấy là công nhân."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 46.768583,
+        "end": 48.578583,
+        "correctAnswer": "【Anh】【ấy】【là】【đầu】【bếp】【có】【phải】【không】?",
+        "translation": "他是厨师，对吗？",
+        "options": [
+            "Anh ấy là đầu bếp có phái không?",
+            "Anh ẩy là đầu bếp có phải không?",
+            "Anh ấy là đầu bét có phải không?",
+            "Anh ấy là đầu bếp có phải không?"
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 48.718583,
+        "end": 50.848583,
+        "correctAnswer": "【Không】. 【Anh】【ấy】【là】【lái】【xe】.",
+        "translation": "不，他是司机。",
+        "options": [
+            "Không. Anh ấy là lái xê.",
+            "Không. Anh ẩy là lái xe.",
+            "Không. Anh ấy là lại xe.",
+            "Không. Anh ấy là lái xe."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 51.278583,
+        "end": 52.598583,
+        "correctAnswer": "【Chị】【ấy】【làm】【nghề】【gì】?",
+        "translation": "她做什么工作？",
+        "options": [
+            "Chị ẩy làm nghề gì?",
+            "Chị ấy làm nghè gì?",
+            "Chị ấy làm nghề dì?",
+            "Chị ấy làm nghề gì?"
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 53.098583,
+        "end": 54.628583,
+        "correctAnswer": "【Chị】【ấy】【là】【nhân】【viên】【phải】【không】?",
+        "translation": "她是职员，对吗？",
+        "options": [
+            "Chị ấy là nhân viền phải không?",
+            "Chị ấy là nhăn viên phải không?",
+            "Chị ấy là nhân viên phái không?",
+            "Chị ấy là nhân viên phải không?"
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 54.838583,
+        "end": 56.758583,
+        "correctAnswer": "【Không】. 【Chị】【ấy】【là】【giám】【đốc】.",
+        "translation": "不，她是总经理。",
+        "options": [
+            "Không. Chị ấy là giam đốc.",
+            "Không. Chị ẩy là giám đốc.",
+            "Không. Chị ấy là giám độc.",
+            "Không. Chị ấy là giám đốc."
+        ]
+    }
+];
+
+        let currentIndex = 0;
+        let isFreeMode = true;
+        let autoContinue = false;
+        let showTranslation = true;
+        let correctCount = 0;
+        let userAnswers = [];
+        let selectedWords = [];
+        let isChecking = false;
+        let isAudioPlaying = false;
+
+        const audio = document.getElementById('mainAudio');
+        const correctAudio = document.getElementById('correctAudio');
+        const wrongAudio = document.getElementById('wrongAudio');
+        const indicator = document.getElementById('indicator');
+        const indicator2 = document.getElementById('indicator2');
+        const optionsPool = document.getElementById('optionsPool');
+        const sentenceNumber = document.getElementById('sentenceNumber');
+        const scoreDisplay = document.getElementById('score');
+        const resultsDisplay = document.getElementById('results');
+
+        function init() {
+            userAnswers = new Array(sentences.length).fill(null);
+            updateDisplay();
+        }
+
+        function updateDisplay() {
+            sentenceNumber.value = currentIndex + 1;
+            const s = sentences[currentIndex];
+            
+            if (showTranslation) {
+                indicator.innerHTML = `<div style="color:#63a0d8;font-size:0.6em;">${s.translation}</div>`;
+            } else {
+                indicator.innerHTML = '';
+            }
+
+            const words = s.correctAnswer.match(/【(.*?)】/g).map(t => t.slice(1,-1));
+            const shuffled = shuffleArray(words);
+
+            optionsPool.innerHTML = '';
+            indicator2.innerHTML = '';
+            indicator2.className = '';
+            selectedWords = [];
+            isChecking = false;
+
+            shuffled.forEach(word => {
+                const btn = document.createElement('div');
+                btn.className = 'word-btn';
+                btn.textContent = word;
+                btn.onclick = () => selectWord(word, btn);
+                optionsPool.appendChild(btn);
+            });
+
+            document.getElementById('prevBtn').classList.toggle('disabled', !isFreeMode && currentIndex === 0);
+        }
+
+        function selectWord(word, btn) {
+            if (btn.classList.contains('used')) {
+                const idx = selectedWords.indexOf(word);
+                if (idx > -1) {
+                    selectedWords.splice(idx, 1);
+                    btn.classList.remove('used');
+                    renderAnswerArea();
+                }
+                return;
+            }
+
+            selectedWords.push(word);
+            btn.classList.add('used');
+            renderAnswerArea();
+
+            indicator2.classList.remove('correct', 'wrong');
+            
+            if (selectedWords.length === getCorrectWords().length && !isChecking) {
+                isChecking = true;
+                setTimeout(checkAnswer, 400);
+            }
+        }
+
+        function renderAnswerArea() {
+            indicator2.innerHTML = '';
+            selectedWords.forEach((word, i) => {
+                const btn = document.createElement('div');
+                btn.className = 'word-btn word-btn-in-answer';
+                btn.textContent = word;
+                btn.onclick = () => {
+                    selectedWords.splice(i, 1);
+                    renderAnswerArea();
+                    Array.from(optionsPool.children).find(b => b.textContent === word)?.classList.remove('used');
+                    isChecking = false;
+                    indicator2.classList.remove('correct', 'wrong');
+                };
+                indicator2.appendChild(btn);
+            });
+        }
+
+        function getCorrectWords() {
+            return sentences[currentIndex].correctAnswer.match(/【(.*?)】/g).map(t => t.slice(1,-1));
+        }
+
+        function getCorrectAnswerWithSpaces() {
+            const words = getCorrectWords();
+            return words.join(' ');
+        }
+
+        function checkAnswer() {
+            const userStr = selectedWords.join('');
+            const correctStr = getCorrectWords().join('');
+            const isCorrect = userStr === correctStr;
+
+            if (!isFreeMode && userAnswers[currentIndex] === null) {
+                userAnswers[currentIndex] = selectedWords.join(' ');
+                if (isCorrect) correctCount++;
+                updateScore();
+            }
+
+            if (isCorrect) {
+                indicator2.classList.add('correct');
+                indicator2.classList.remove('wrong');
+                correctAudio.play();
+                playOriginalSentenceExactly();
+            } else {
+                indicator2.classList.add('wrong');
+                wrongAudio.play();
+                
+                // Trong chế độ 作业模式, phát âm thanh ngay cả khi sai
+                if (!isFreeMode) {
+                    playOriginalSentenceExactly();
+                }
+            }
+
+            const delay = 1200;
+            
+            const moveToNextSentence = () => {
+                if (isFreeMode) {
+                    if (autoContinue && isCorrect) {
+                        nextSentence();
+                    }
+                } else {
+                    if (currentIndex < sentences.length - 1) {
+                        currentIndex++;
+                        updateDisplay();
+                    } else {
+                        showFinalResults();
+                    }
+                }
+            };
+            
+            setTimeout(() => {
+                if (!isAudioPlaying) {
+                    moveToNextSentence();
+                } else {
+                    const checkAudioEnd = setInterval(() => {
+                        if (!isAudioPlaying) {
+                            clearInterval(checkAudioEnd);
+                            moveToNextSentence();
+                        }
+                    }, 100);
+                }
+            }, delay);
+        }
+
+        function playOriginalSentenceExactly() {
+            const s = sentences[currentIndex];
+            audio.src = s.audioFile;
+            audio.currentTime = s.start;
+            isAudioPlaying = true;
+            audio.play();
+
+            const stopAtEnd = () => {
+                if (audio.currentTime >= s.end) {
+                    audio.pause();
+                    isAudioPlaying = false;
+                    audio.removeEventListener('timeupdate', stopAtEnd);
+                }
+            };
+            audio.addEventListener('timeupdate', stopAtEnd);
+            
+            audio.addEventListener('ended', () => {
+                isAudioPlaying = false;
+            });
+        }
+
+        document.getElementById('replayBtn').onclick = playOriginalSentenceExactly;
+
+        function showFinalResults() {
+            let text = `练习完成！\n正确：${correctCount}/${sentences.length}（${(correctCount/sentences.length*100).toFixed(1)}%）\n\n`;
+            
+            let hasWrong = false;
+            let wrongQuestionsText = "错题回顾：\n";
+            
+            for (let i = 0; i < sentences.length; i++) {
+                const correctWords = getCorrectWordsFromSentence(sentences[i]);
+                const correctAnswerWithSpaces = correctWords.join(' ');
+                
+                if (userAnswers[i] && userAnswers[i] !== correctAnswerWithSpaces) {
+                    hasWrong = true;
+                    wrongQuestionsText += `${i+1}. ${sentences[i].translation}\n   你的答案: ${userAnswers[i]}\n   正确答案: ${correctAnswerWithSpaces}\n\n`;
+                }
+            }
+            
+            if (hasWrong) {
+                text += wrongQuestionsText;
+            } else {
+                text += "全对！太厉害了！";
+            }
+            
+            resultsDisplay.textContent = text;
+            resultsDisplay.style.display = 'block';
+            scoreDisplay.style.display = 'none';
+        }
+
+        function getCorrectWordsFromSentence(sentence) {
+            return sentence.correctAnswer.match(/【(.*?)】/g).map(t => t.slice(1,-1));
+        }
+
+        function updateScore() {
+            scoreDisplay.textContent = `${correctCount}/${sentences.length}`;
+        }
+
+        function nextSentence() {
+            if (currentIndex < sentences.length - 1) {
+                currentIndex++;
+                updateDisplay();
+            } else if (isFreeMode) {
+                currentIndex = 0;
+                updateDisplay();
+            }
+        }
+
+        function prevSentence() {
+            if (currentIndex > 0) {
+                currentIndex--;
+                updateDisplay();
+            } else if (isFreeMode) {
+                currentIndex = sentences.length - 1;
+                updateDisplay();
+            }
+        }
+
+        function shuffleArray(a) {
+            const arr = [...a];
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        document.getElementById('freeModeBtn').onclick = () => {
+            isFreeMode = true;
+            document.getElementById('freeModeBtn').classList.add('active-mode');
+            document.getElementById('testModeBtn').classList.remove('active-mode');
+            scoreDisplay.style.display = 'none';
+            resultsDisplay.style.display = 'none';
+            updateDisplay();
+        };
+
+        document.getElementById('testModeBtn').onclick = () => {
+            isFreeMode = false;
+            document.getElementById('testModeBtn').classList.add('active-mode');
+            document.getElementById('freeModeBtn').classList.remove('active-mode');
+            scoreDisplay.style.display = 'block';
+            resultsDisplay.style.display = 'none';
+            currentIndex = 0;
+            correctCount = 0;
+            userAnswers = new Array(sentences.length).fill(null);
+            updateDisplay();
+        };
+
+        document.getElementById('prevBtn').onclick = () => {
+            if (isFreeMode) {
+                prevSentence();
+            } else if (currentIndex > 0) {
+                currentIndex--;
+                updateDisplay();
+            }
+        };
+        
+        document.getElementById('nextBtn').onclick = () => {
+            if (isFreeMode) {
+                nextSentence();
+            } else if (currentIndex < sentences.length - 1) {
+                currentIndex++;
+                updateDisplay();
+            }
+        };
+
+        document.getElementById('autoContinueBtn').onclick = () => {
+            autoContinue = !autoContinue;
+            document.getElementById('autoContinueBtn').classList.toggle('active-mode', autoContinue);
+        };
+
+        document.getElementById('showHideBtn').onclick = () => {
+            showTranslation = !showTranslation;
+            document.getElementById('showHideBtn').classList.toggle('active-mode', showTranslation);
+            updateDisplay();
+        };
+
+        sentenceNumber.onchange = () => {
+            if (isFreeMode) {
+                const n = parseInt(sentenceNumber.value) - 1;
+                if (n >= 0 && n < sentences.length) { 
+                    currentIndex = n; 
+                    updateDisplay(); 
+                }
+            }
+        };
+
+        init();
+    </script>
+</body>
+</html>
